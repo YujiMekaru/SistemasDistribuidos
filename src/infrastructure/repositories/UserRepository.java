@@ -103,12 +103,32 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public User find(String username, String password) throws Exception {
+    public User login(String username, String password) throws Exception {
         Connection conn = DbConnection.getMySqlConnection();
         String query = "SELECT * FROM user WHERE username = ? AND password = ?";
         PreparedStatement statement = conn.prepareStatement(query);
         statement.setString(1, username);
         statement.setString(2, password);
+        System.out.printf("*\n"+statement.toString()+"\n*\n");
+        ResultSet rs = statement.executeQuery();
+
+        if (rs.next() == false)
+            return null;
+        
+        User user = new User(Integer.parseInt(rs.getString("iduser")), rs.getString("username"), rs.getString("password"));
+        rs.close();
+        statement.close();
+        conn.close();
+        return user;
+    }
+    
+    @Override
+    public User logout(String username) throws Exception {
+        System.out.println("entrou aqui");
+        Connection conn = DbConnection.getMySqlConnection();
+        String query = "SELECT * FROM user WHERE username = ?";
+        PreparedStatement statement = conn.prepareStatement(query);
+        statement.setString(1, username);
         System.out.printf("*\n"+statement.toString()+"\n*\n");
         ResultSet rs = statement.executeQuery();
 

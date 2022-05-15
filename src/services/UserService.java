@@ -7,7 +7,10 @@ package services;
 
 import infrastructure.repositories.IUserRepository;
 import infrastructure.repositories.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import models.User;
+import server.TcpServer2;
 
 /**
  *
@@ -16,9 +19,11 @@ import models.User;
 public class UserService {
     
     private IUserRepository userRepository;
+    List<User> onlineUsers;
     
-    public UserService()
+    public UserService(ArrayList<User> onlineUsers)
     {
+        this.onlineUsers = onlineUsers;
         userRepository = new UserRepository();
     }
     
@@ -42,13 +47,18 @@ public class UserService {
     {
         try
         {
-            User user = userRepository.find(username, password);
-            System.out.println("Usuario encontrado!");
+            User user = userRepository.login(username, password);
+            
+            if (user == null)
+                return false;
+                        
+            onlineUsers.add(user);
+            onlineUsers.forEach(a -> System.out.println("Logados : " + a.getUsername()));
             return true;
         }
         catch(Exception e)
         {
-            System.out.println(e);
+            System.out.println("aqui - " + e);
             return false;
         }
         
@@ -56,6 +66,22 @@ public class UserService {
     
     public void logout(String username)
     {
-        System.out.println("Logout feito!");
+        try
+        {
+            User user = userRepository.logout(username);
+            System.out.println("usuario encontrado logout : "+ user.getUsername());
+            onlineUsers.forEach(u -> {
+                if (u.getUsername().equals(user.getUsername()))
+                {
+                    onlineUsers.remove(u);
+                }
+            });
+            System.out.println(username + " deslogado!");
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+
     }
 }

@@ -13,5 +13,6 @@ import models.User;
  * @author madeinweb
  */
 public interface IUserRepository extends IRepository<User>{
-    User find(String username, String password) throws Exception;
+    User login(String username, String password) throws Exception;
+    User logout(String username) throws Exception;
 }

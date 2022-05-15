@@ -13,6 +13,9 @@ import DTOs.*;
 import DTOs.requests.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import models.User;
 import services.UserService;
 
 /**
@@ -24,10 +27,10 @@ public class ServerThread extends Thread
     private Socket socket;
     private UserService userService;
     
-    public ServerThread(Socket socket)
+    public ServerThread(Socket socket, ArrayList<User> onlineUsers)
     {
         this.socket = socket;
-        userService = new UserService();
+        userService = new UserService(onlineUsers);
     }
     
     public void run()
@@ -47,7 +50,7 @@ public class ServerThread extends Thread
                 jsonRequest = reader.readLine();
                 System.out.println("Cliente Enviou : "+jsonRequest);
                 String response = TreatRequest(jsonRequest);
-                writer.println("Server enviou : " + response);
+                writer.println(response);
             } while(!jsonRequest.equals("Bye"));
             
             System.out.println("ENCERROU");
@@ -55,8 +58,7 @@ public class ServerThread extends Thread
         } 
         catch(IOException ex) 
         {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();   
+            System.out.println("Encerramento forçado de " + socket.getLocalAddress()); 
         }
     }
     

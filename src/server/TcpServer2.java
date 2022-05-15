@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import models.User;
 
@@ -21,8 +23,8 @@ public class TcpServer2 {
     
     public static void main(String[] args)
     {
-
-      
+       ArrayList<User> onlineUsers = new ArrayList<User>(); 
+             
        int port = 10009;
        
        try (ServerSocket serverSocket = new ServerSocket(port))
@@ -34,7 +36,7 @@ public class TcpServer2 {
                Socket socket = serverSocket.accept();
                System.out.println("New client connected");
                
-               new ServerThread(socket).start();
+               new ServerThread(socket, onlineUsers).start();
            }
        }
        catch (IOException ex)
@@ -43,4 +45,5 @@ public class TcpServer2 {
            ex.printStackTrace();
        }
     }
+
 }
