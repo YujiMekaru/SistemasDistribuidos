@@ -5,12 +5,10 @@
  */
 package server;
 
-import DTOs.responses.DefaultResponse;
-import DTOs.requests.DefaultRequest;
 import java.io.*;
 import java.net.Socket;
-import DTOs.*;
 import DTOs.requests.*;
+import DTOs.responses.DefaultResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;

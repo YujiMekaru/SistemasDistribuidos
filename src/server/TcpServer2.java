@@ -25,7 +25,7 @@ public class TcpServer2 {
     {
        ArrayList<User> onlineUsers = new ArrayList<User>(); 
              
-       int port = 10009;
+       int port = 20009;
        
        try (ServerSocket serverSocket = new ServerSocket(port))
        {

@@ -47,6 +47,7 @@ public class LoginScreen extends DefaultScreen {
      username.setBounds(60, 55, 75, 25);
      password.setBounds(68, 95, 75, 25);
 
+     frame.setTitle("Sistema de Vendas");
      frame.add(botaoCadastro);
      frame.add(botaoLogin);
      frame.add(login);

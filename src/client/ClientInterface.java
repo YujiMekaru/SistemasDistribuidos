@@ -42,7 +42,7 @@ public class ClientInterface {
         JFrame f = new JFrame();
         
         try {
-            socket = new Socket(serverHostname, 10009);
+            socket = new Socket(serverHostname, 20009);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(
                                         socket.getInputStream()));
