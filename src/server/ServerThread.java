@@ -14,6 +14,7 @@ import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import models.User;
+import services.NoDbUserService;
 import services.UserService;
 
 /**
@@ -23,12 +24,12 @@ import services.UserService;
 public class ServerThread extends Thread
 {
     private Socket socket;
-    private UserService userService;
+    private NoDbUserService userService;
     
-    public ServerThread(Socket socket, ArrayList<User> onlineUsers)
+    public ServerThread(Socket socket, NoDbUserService userService)
     {
         this.socket = socket;
-        userService = new UserService(onlineUsers);
+        this.userService = userService;
     }
     
     public void run()

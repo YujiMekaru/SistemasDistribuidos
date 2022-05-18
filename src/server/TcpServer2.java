@@ -13,7 +13,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.JFrame;
 import models.User;
+import services.NoDbUserService;
 
 /**
  *
@@ -23,27 +25,12 @@ public class TcpServer2 {
     
     public static void main(String[] args)
     {
-       ArrayList<User> onlineUsers = new ArrayList<User>(); 
-             
-       int port = 20009;
-       
-       try (ServerSocket serverSocket = new ServerSocket(port))
-       {
-           System.out.println("Server is listening on port : " + port);
-           
-           while (true)
-           {
-               Socket socket = serverSocket.accept();
-               System.out.println("New client connected");
-               
-               new ServerThread(socket, onlineUsers).start();
-           }
-       }
-       catch (IOException ex)
-       {
-           System.out.println("Server exception : "+ ex.getMessage());
-           ex.printStackTrace();
-       }
+       NoDbUserService userService = new NoDbUserService();
+       JFrame frame = new JFrame();
+       ServerScreen serverScreen = new ServerScreen(frame, userService);
+       serverScreen.build();
+       serverScreen.waitConnection();
+
     }
 
 }

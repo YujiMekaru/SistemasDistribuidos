@@ -9,11 +9,11 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import services.NoDbUserService;
 
 public class ServerInterface {
 
     public static void main(String[] args){
-        ArrayList<User> onlineUsers = new ArrayList<User>();
 
         int port = 20009;
         JFrame f = new JFrame();
@@ -22,8 +22,9 @@ public class ServerInterface {
         BufferedReader in = null;
         Socket socket = null;
 
-        ServerScreen serverScreen = new ServerScreen(f, in, out, socket);
-        serverScreen.build();
+        NoDbUserService userService = new NoDbUserService();
+        // ServerScreen serverScreen = new ServerScreen(f, in, out, socket);
+        // serverScreen.build();
 
         try (ServerSocket serverSocket = new ServerSocket(port))
         {
@@ -34,7 +35,7 @@ public class ServerInterface {
                 socket = serverSocket.accept();
                 System.out.println("New client connected");
 
-                new ServerThread(socket, onlineUsers).start();
+                new ServerThread(socket, userService).start();
             }
         }
         catch (IOException ex)

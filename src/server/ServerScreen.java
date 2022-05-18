@@ -4,22 +4,47 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
+import services.NoDbUserService;
 
 public class ServerScreen {
     protected JFrame frame;
     protected BufferedReader in;
     protected PrintWriter out;
     protected Socket socket;
+    protected NoDbUserService userService;
 
-    public ServerScreen(JFrame frame, BufferedReader in, PrintWriter out, Socket socket) {
+    public ServerScreen(JFrame frame, NoDbUserService userService) {
         this.frame = frame;
-        this.in = in;
-        this.out = out;
-        this.socket = socket;
+        this.userService = userService;
     }
+    
+    public void waitConnection()
+    {
+        int port = 20009;
+       
+        try (ServerSocket serverSocket = new ServerSocket(port))
+        {
+            System.out.println("Server is listening on port : " + port);
 
+            while (true)
+            {
+                Socket socket = serverSocket.accept();
+                System.out.println("New client connected");
+
+                new ServerThread(socket, userService).start();
+            }
+        }
+        catch (IOException ex)
+        {
+            System.out.println("Server exception : "+ ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
     public void build(){
         JLabel server = new JLabel("Bem Vindo");
         JLabel portText = new JLabel("Informe a porta:");
