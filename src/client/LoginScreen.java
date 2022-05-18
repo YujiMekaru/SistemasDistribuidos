@@ -39,13 +39,13 @@ public class LoginScreen extends DefaultScreen {
      JButton botaoCadastro = new JButton("Registro");
      JButton botaoLogin = new JButton("Login");
 
-     botaoLogin.setBounds(100, 140, 100, 40);
-     botaoCadastro.setBounds(100, 190, 100, 40);
-     usernameBox.setBounds(110, 55, 75, 25);
-     passwordBox.setBounds(110, 95, 75, 25);
      login.setBounds(110, 1, 75, 75);
-     username.setBounds(60, 55, 75, 25);
-     password.setBounds(68, 95, 75, 25);
+     username.setBounds(60, 75, 75, 25);
+     usernameBox.setBounds(110, 75, 75, 25);
+     password.setBounds(68, 115, 75, 25);
+     passwordBox.setBounds(110, 115, 75, 25);
+     botaoLogin.setBounds(100, 290, 100, 40);
+     botaoCadastro.setBounds(100, 340, 100, 40);
 
      frame.setTitle("Sistema de Vendas");
      frame.add(botaoCadastro);
@@ -55,7 +55,7 @@ public class LoginScreen extends DefaultScreen {
      frame.add(password);
      frame.add(usernameBox);
      frame.add(passwordBox);
-     frame.setSize(300, 300);
+     frame.setSize(300, 500);
      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
      frame.setLayout(null);
      frame.setVisible(true);
@@ -71,11 +71,13 @@ public class LoginScreen extends DefaultScreen {
                  loginRequest.setOp(100);
                  loginRequest.setUsername(username);
                  loginRequest.setPassword(password);
+
                  System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(loginRequest) + "\n\n");
                  out.println(gson.toJson(loginRequest));
                  String resposta = in.readLine();
                  System.out.println("Servidor respondeu : " + resposta);
                  DefaultResponse serverResponse = gson.fromJson(resposta, DefaultResponse.class);
+
                  if (serverResponse.getStatus() == 101)
                  {
                      JFrame afterLoginFrame = new JFrame();
@@ -105,10 +107,12 @@ public class LoginScreen extends DefaultScreen {
                  registerRequest.setOp(300);
                  registerRequest.setUsername(username);
                  registerRequest.setPassword(password);
+
                  System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(registerRequest) + "\n\n");
                  out.println(gson.toJson(registerRequest));
                  String resposta = in.readLine();
                  System.out.println("Servidor respondeu : " + resposta);
+
              } catch (IOException ex) {
                  Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
              }
