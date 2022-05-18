@@ -34,7 +34,7 @@ public class ClientInterface {
         if (args.length > 0)
            serverHostname = args[0];
         System.out.println ("Attemping to connect to host " +
-                serverHostname + " on port 10009.");
+                serverHostname + " on port 20009.");
 
         Socket socket = null;
         PrintWriter out = null;
