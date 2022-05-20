@@ -30,11 +30,11 @@ import javax.swing.JTextPane;
  */
 public class ClientInterface {
    public static void main(String[] args) {
-        String serverHostname = new String ("127.0.0.1");
+        String serverHostname = new String ("10.40.3.0");
         if (args.length > 0)
            serverHostname = args[0];
         System.out.println ("Attemping to connect to host " +
-                serverHostname + " on port 20009.");
+                serverHostname + " on port 20000.");
 
         Socket socket = null;
         PrintWriter out = null;
@@ -42,7 +42,7 @@ public class ClientInterface {
         JFrame f = new JFrame();
         
         try {
-            socket = new Socket(serverHostname, 20009);
+            socket = new Socket(serverHostname, 20000);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(
                                         socket.getInputStream()));

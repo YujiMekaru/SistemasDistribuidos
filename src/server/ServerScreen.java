@@ -22,9 +22,8 @@ public class ServerScreen {
         this.userService = userService;
     }
     
-    public void waitConnection()
+    public void waitConnection(int port)
     {
-        int port = 20009;
        
         try (ServerSocket serverSocket = new ServerSocket(port))
         {
@@ -71,7 +70,7 @@ public class ServerScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int port = Integer.parseInt(portBox.getText());
-
+                    waitConnection(port);
             }
         });
 

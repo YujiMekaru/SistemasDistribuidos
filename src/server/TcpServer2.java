@@ -29,7 +29,7 @@ public class TcpServer2 {
        JFrame frame = new JFrame();
        ServerScreen serverScreen = new ServerScreen(frame, userService);
        serverScreen.build();
-       serverScreen.waitConnection();
+       // serverScreen.waitConnection(20000); // essa linha vai sair, e ir pra dentro do evento do botao
 
     }
 
