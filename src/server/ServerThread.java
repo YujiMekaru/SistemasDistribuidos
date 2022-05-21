@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JList;
 import models.User;
 import services.NoDbUserService;
 import services.UserService;
@@ -26,7 +27,7 @@ public class ServerThread extends Thread
     private Socket socket;
     private NoDbUserService userService;
     
-    public ServerThread(Socket socket, NoDbUserService userService)
+    public ServerThread(Socket socket, NoDbUserService userService, JList listAllUsers, JList listOnlineUsers)
     {
         this.socket = socket;
         this.userService = userService;

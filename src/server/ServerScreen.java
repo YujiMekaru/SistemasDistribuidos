@@ -16,52 +16,77 @@ public class ServerScreen {
     protected PrintWriter out;
     protected Socket socket;
     protected NoDbUserService userService;
-
-    public ServerScreen(JFrame frame, NoDbUserService userService) {
+    JButton buttonPort;
+    JList listAllUsers;
+    JList listOnlineUsers;
+    
+    public ServerScreen(JFrame frame) {
         this.frame = frame;
-        this.userService = userService;
+        build();
+        this.userService = new NoDbUserService(listAllUsers, listOnlineUsers);
     }
     
     public void waitConnection(int port)
     {
-       
-        try (ServerSocket serverSocket = new ServerSocket(port))
-        {
-            System.out.println("Server is listening on port : " + port);
+       buttonPort.setEnabled(false);
+       Thread waitConnectionThread = new Thread(){
+            public void run(){
+                try (ServerSocket serverSocket = new ServerSocket(port))
+                {
+                    System.out.println("Server is listening on port : " + port);
 
-            while (true)
-            {
-                Socket socket = serverSocket.accept();
-                System.out.println("New client connected");
+                    while (true)
+                    {
+                        Socket socket = serverSocket.accept();
+                        System.out.println("New client connected");
 
-                new ServerThread(socket, userService).start();
+                        new ServerThread(socket, userService, listAllUsers, listOnlineUsers).start();
+                    }
+                }
+                catch (IOException ex)
+                {
+                    System.out.println("Server exception : "+ ex.getMessage());
+                    ex.printStackTrace();
+                }
             }
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Server exception : "+ ex.getMessage());
-            ex.printStackTrace();
-        }
+        };
+       waitConnectionThread.start();
     }
+
     
     public void build(){
-        JLabel server = new JLabel("Bem Vindo");
+        JLabel title = new JLabel("Bem Vindo");
         JLabel portText = new JLabel("Informe a porta:");
         JTextField portBox = new JTextField();
-        JButton buttonPort= new JButton("Salvar");
+        buttonPort = new JButton("Salvar");
+        listAllUsers = new JList();
+        listOnlineUsers = new JList();
+        
+        JLabel labelOnlineUsers = new JLabel("Online:");
+        JLabel labelAllUsers = new JLabel("Cadastrados:");
+        
+        title.setBounds(200, 1, 75, 75);
+        
+        listAllUsers.setBounds(200, 75, 100, 200);
+        listOnlineUsers.setBounds(325, 75, 100, 200);
+        
+        portText.setBounds(60, 75, 100,25);
+        portBox.setBounds(60, 100, 80, 25);
+        buttonPort.setBounds(60, 140, 80, 40);
 
-        server.setBounds(110, 1, 75, 75);
-        portText.setBounds(105, 75, 100,25);
-        portBox.setBounds(110   , 100, 80, 25);
-        buttonPort.setBounds(100, 340, 100, 40);
-        buttonPort.setBounds(100, 340, 100, 40);
-
+        labelOnlineUsers.setBounds(325, 55, 100, 25);
+        labelAllUsers.setBounds(200, 55, 100, 25);
+        
         frame.setTitle("Sistema de Vendas");
-        frame.add(server);
+        frame.add(title);
         frame.add(buttonPort);
         frame.add(portText);
         frame.add(portBox);
-        frame.setSize(300, 500);
+        frame.add(listAllUsers);
+        frame.add(listOnlineUsers);
+        frame.add(labelOnlineUsers);
+        frame.add(labelAllUsers);
+        frame.setSize(500, 350);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
         frame.setVisible(true);

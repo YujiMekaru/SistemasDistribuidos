@@ -27,5 +27,4 @@ public class DefaultScreen {
         this.out = out;
         this.socket = socket;
     }
-   
 }

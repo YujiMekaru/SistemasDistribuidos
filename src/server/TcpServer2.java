@@ -25,10 +25,9 @@ public class TcpServer2 {
     
     public static void main(String[] args)
     {
-       NoDbUserService userService = new NoDbUserService();
+       // NoDbUserService userService = new NoDbUserService();
        JFrame frame = new JFrame();
-       ServerScreen serverScreen = new ServerScreen(frame, userService);
-       serverScreen.build();
+       ServerScreen serverScreen = new ServerScreen(frame);
        // serverScreen.waitConnection(20000); // essa linha vai sair, e ir pra dentro do evento do botao
 
     }

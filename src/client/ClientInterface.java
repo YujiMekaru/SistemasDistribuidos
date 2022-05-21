@@ -30,37 +30,40 @@ import javax.swing.JTextPane;
  */
 public class ClientInterface {
    public static void main(String[] args) {
-        String serverHostname = new String ("10.40.3.0");
-        if (args.length > 0)
-           serverHostname = args[0];
-        System.out.println ("Attemping to connect to host " +
-                serverHostname + " on port 20000.");
-
-        Socket socket = null;
-        PrintWriter out = null;
-        BufferedReader in = null;
-        JFrame f = new JFrame();
-        
-        try {
-            socket = new Socket(serverHostname, 20000);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(
-                                        socket.getInputStream()));
-            System.out.println("Connected!");
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host: " + serverHostname);
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for "
-                               + "the connection to: " + serverHostname);
-            System.exit(1);
-        }
-
-	BufferedReader stdIn = new BufferedReader(
-                                   new InputStreamReader(System.in));
-        
-        LoginScreen loginScreen = new LoginScreen(f, in, out, socket);
-        loginScreen.build();
+       JFrame frame = new JFrame();
+       ConnectionScreen connectionScreen = new ConnectionScreen(frame);
+       connectionScreen.build();
+//        String serverHostname = new String ("127.0.0.1");
+//        if (args.length > 0)
+//           serverHostname = args[0];
+//        System.out.println ("Attemping to connect to host " +
+//                serverHostname + " on port 20000.");
+//
+//        Socket socket = null;
+//        PrintWriter out = null;
+//        BufferedReader in = null;
+//        JFrame f = new JFrame();
+//        
+//        try {
+//            socket = new Socket(serverHostname, 20000);
+//            out = new PrintWriter(socket.getOutputStream(), true);
+//            in = new BufferedReader(new InputStreamReader(
+//                                        socket.getInputStream()));
+//            System.out.println("Connected!");
+//        } catch (UnknownHostException e) {
+//            System.err.println("Don't know about host: " + serverHostname);
+//            System.exit(1);
+//        } catch (IOException e) {
+//            System.err.println("Couldn't get I/O for "
+//                               + "the connection to: " + serverHostname);
+//            System.exit(1);
+//        }
+//
+//	BufferedReader stdIn = new BufferedReader(
+//                                   new InputStreamReader(System.in));
+//        
+//        LoginScreen loginScreen = new LoginScreen(f, in, out, socket);
+//        loginScreen.build();
    }
    
     

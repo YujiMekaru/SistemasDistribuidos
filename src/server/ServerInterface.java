@@ -22,7 +22,7 @@ public class ServerInterface {
         BufferedReader in = null;
         Socket socket = null;
 
-        NoDbUserService userService = new NoDbUserService();
+        // NoDbUserService userService = new NoDbUserService();
         // ServerScreen serverScreen = new ServerScreen(f, in, out, socket);
         // serverScreen.build();
 
@@ -35,7 +35,7 @@ public class ServerInterface {
                 socket = serverSocket.accept();
                 System.out.println("New client connected");
 
-                new ServerThread(socket, userService).start();
+//                new ServerThread(socket, userService).start();
             }
         }
         catch (IOException ex)

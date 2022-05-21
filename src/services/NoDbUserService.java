@@ -9,6 +9,8 @@ import infrastructure.repositories.IUserRepository;
 import infrastructure.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import models.User;
 
 /**
@@ -16,23 +18,29 @@ import models.User;
  * @author madeinweb
  */
 public class NoDbUserService {
-    List<User> onlineUsers;
-    List<User> userList;
+    private List<User> onlineUsers;
+    private List<User> userList;
+    private JList listAllUsers;
+    private JList listOnlineUsers;
     
-    public NoDbUserService()
+    public NoDbUserService(JList listAllUsers, JList listOnlineUsers)
     {
         onlineUsers = new ArrayList<>();
         userList = new ArrayList<>();
+        this.listAllUsers = listAllUsers;
+        this.listOnlineUsers = listOnlineUsers;
         
         populateScript();
     }
     
     private void populateScript()
     {
-        register("abc","123");
-        register("def","123");
-        register("ghi","123");
+        register("Joao","123");
+        register("Pedro","123");
+        register("Andre","123");
     }
+    
+
     
     public boolean register(String username, String password)
     {
@@ -46,6 +54,10 @@ public class NoDbUserService {
                 return false;
         }
         userList.add(newUser);
+
+        DefaultListModel listModel = new DefaultListModel();
+        userList.forEach(user -> listModel.addElement(user.getUsername()));
+        listAllUsers.setModel(listModel);
         return true;
     }
     
@@ -71,6 +83,11 @@ public class NoDbUserService {
                 newUser.setPassword(password);
                 onlineUsers.add(newUser);
                 onlineUsers.forEach(a -> System.out.println("Logados : " + a.getUsername()));
+                
+                DefaultListModel listModel = new DefaultListModel();
+                onlineUsers.forEach(user -> listModel.addElement(user.getUsername()));
+                listOnlineUsers.setModel(listModel);
+        
                 return true;
             }
         }
@@ -84,6 +101,11 @@ public class NoDbUserService {
             if (onlineUsers.get(i).getUsername().equals(username))
             {
                 onlineUsers.remove(onlineUsers.get(i));
+                
+                DefaultListModel listModel = new DefaultListModel();
+                onlineUsers.forEach(user -> listModel.addElement(user.getUsername()));
+                listOnlineUsers.setModel(listModel);
+                
                 return true;
             }
         }
