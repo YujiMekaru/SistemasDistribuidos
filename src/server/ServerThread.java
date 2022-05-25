@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.Socket;
 import DTOs.requests.*;
 import DTOs.responses.DefaultResponse;
+import DTOs.responses.ErrorResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class ServerThread extends Thread
                     result = userService.register(registerRequest.getUsername(), registerRequest.getPassword());
                     if (result)
                         return gson.toJson(new DefaultResponse(301));
-                    return gson.toJson(new DefaultResponse(302));
+                    return gson.toJson(new ErrorResponse(302, "Erro no Cadastro."));
                         
                 default: 
                     return gson.toJson(new DefaultResponse(999), DefaultResponse.class);

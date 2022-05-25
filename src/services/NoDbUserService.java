@@ -44,6 +44,9 @@ public class NoDbUserService {
     
     public boolean register(String username, String password)
     {
+        if (username.equals("") || password.equals(""))
+            return false;
+            
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setPassword(password);
