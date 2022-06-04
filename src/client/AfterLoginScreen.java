@@ -5,6 +5,7 @@
  */
 package client;
 
+import DTOs.requests.ListProductsRequestDTO;
 import DTOs.requests.LoginRequestDTO;
 import DTOs.requests.LogoutRequestDTO;
 import DTOs.responses.DefaultResponse;
@@ -55,28 +56,41 @@ public class AfterLoginScreen extends DefaultScreen {
         botaoLogout.addActionListener((ActionListener) new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
-             try {
-                 Gson gson = new Gson();
-                 LogoutRequestDTO logoutRequest = new LogoutRequestDTO();
-                 logoutRequest.setOp(200);
-                 logoutRequest.setUsername(username);
-                 System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(logoutRequest) + "\n\n");
-                 out.println(gson.toJson(logoutRequest));
-                 String resposta = in.readLine();
-                 System.out.println("Servidor respondeu : " + resposta);
-                 DefaultResponse serverResponse = gson.fromJson(resposta, DefaultResponse.class);
-                 if (serverResponse.getStatus() == 201)
-                 {
-                     close();
-                 }
-                 else
-                 {
-                     showMessageDialog(null, "Erro : " + resposta);
-                 }
-
-             } catch (IOException ex) {
-                 Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
-             }
+//             try {
+//                 Gson gson = new Gson();
+//                 LogoutRequestDTO logoutRequest = new LogoutRequestDTO();
+//                 logoutRequest.setOp(200);
+//                 logoutRequest.setUsername(username);
+//                 System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(logoutRequest) + "\n\n");
+//                 out.println(gson.toJson(logoutRequest));
+//                 String resposta = in.readLine();
+//                 System.out.println("Servidor respondeu : " + resposta);
+//                 DefaultResponse serverResponse = gson.fromJson(resposta, DefaultResponse.class);
+//                 if (serverResponse.getStatus() == 201)
+//                 {
+//                     close();
+//                 }
+//                 else
+//                 {
+//                     showMessageDialog(null, "Erro : " + resposta);
+//                 }
+//
+//             } catch (IOException ex) {
+//                 Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
+//             }
+            try {
+                Gson gson = new Gson();
+                ListProductsRequestDTO listAllRequest = new ListProductsRequestDTO();
+                listAllRequest.setOp(500);
+                System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(listAllRequest) + "\n\n");
+                out.println(gson.toJson(listAllRequest));
+                String resposta = in.readLine();
+                System.out.println("Servidor respondeu : " + resposta);  
+            }
+            catch (IOException ex)
+            {
+                Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
+            }
          }
      });
     }

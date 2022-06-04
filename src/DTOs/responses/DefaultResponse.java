@@ -26,4 +26,9 @@ public class DefaultResponse {
     {
         this.status = status;
     }
+    
+    public DefaultResponse()
+    {
+        
+    }
 }

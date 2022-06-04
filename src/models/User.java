@@ -29,6 +29,11 @@ public class User {
         return password;
     }
     
+    public void setId(int value)
+    {
+        id = value;
+    }
+    
     public void setUsername(String value)
     {
         username = value;

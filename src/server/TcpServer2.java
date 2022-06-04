@@ -5,7 +5,6 @@
  */
 package server;
 
-import infrastructure.repositories.UserRepository;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.JFrame;
 import models.User;
-import services.NoDbUserService;
+import services.UserService;
 
 /**
  *

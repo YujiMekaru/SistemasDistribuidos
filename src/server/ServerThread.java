@@ -10,13 +10,15 @@ import java.net.Socket;
 import DTOs.requests.*;
 import DTOs.responses.DefaultResponse;
 import DTOs.responses.ErrorResponse;
+import DTOs.responses.ListProductsResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JList;
+import models.Product;
 import models.User;
-import services.NoDbUserService;
+import services.ProductService;
 import services.UserService;
 
 /**
@@ -26,12 +28,15 @@ import services.UserService;
 public class ServerThread extends Thread
 {
     private Socket socket;
-    private NoDbUserService userService;
+    private UserService userService;
+    private ProductService productService;
+    private User loggedUser;
     
-    public ServerThread(Socket socket, NoDbUserService userService, JList listAllUsers, JList listOnlineUsers)
+    public ServerThread(Socket socket, ProductService productService, UserService userService, JList listAllUsers, JList listOnlineUsers)
     {
         this.socket = socket;
         this.userService = userService;
+        this.productService = productService;
     }
     
     public void run()
@@ -76,9 +81,12 @@ public class ServerThread extends Thread
             {
                 case 100:
                     LoginRequestDTO loginRequest = gson.fromJson(jsonRequest, LoginRequestDTO.class);
-                    result = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
-                    if (result)
+                    User user = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+                    if (user != null)
+                    {
+                        loggedUser = user;
                         return gson.toJson(new DefaultResponse(101), DefaultResponse.class);
+                    }
                     return gson.toJson(new DefaultResponse(102), DefaultResponse.class);
                 case 200:
                     LogoutRequestDTO logoutRequest = gson.fromJson(jsonRequest, LogoutRequestDTO.class);
@@ -90,7 +98,30 @@ public class ServerThread extends Thread
                     if (result)
                         return gson.toJson(new DefaultResponse(301));
                     return gson.toJson(new ErrorResponse(302, "Erro no Cadastro."));
-                        
+                case 400:
+                    ListProductsRequestDTO listAllRequest = gson.fromJson(jsonRequest, ListProductsRequestDTO.class);
+                    List<Product> allProducts = productService.listAll();
+                    ListProductsResponse listAllResponse = new ListProductsResponse(401, allProducts);
+                    return gson.toJson(listAllResponse);
+                case 500:
+                    ListProductsRequestDTO listProductUserRequest = gson.fromJson(jsonRequest, ListProductsRequestDTO.class);
+                    System.out.println("Usuario logado id : " + loggedUser.getId());
+                    List<Product> userProducts = productService.listByUser(loggedUser.getId());
+                    ListProductsResponse listUserProductsResponse = new ListProductsResponse(501, userProducts);
+                    return gson.toJson(listUserProductsResponse);
+                case 800:
+                    CreateProductRequestDTO createProductRequest = gson.fromJson(jsonRequest, CreateProductRequestDTO.class);
+                    result = productService.createProduct(
+                            createProductRequest.getProductName(), 
+                            createProductRequest.getDescription(), 
+                            createProductRequest.getProductValue(), 
+                            loggedUser.getId());
+                    if (result)
+                        return gson.toJson(new DefaultResponse(801));
+                    return gson.toJson(new ErrorResponse(802, "mensagem de erro"));
+        
+                case 900:
+                    
                 default: 
                     return gson.toJson(new DefaultResponse(999), DefaultResponse.class);
             }

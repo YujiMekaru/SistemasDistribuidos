@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import services.NoDbUserService;
+import services.ProductService;
+import services.UserService;
 
 public class ServerScreen {
     protected JFrame frame;
     protected BufferedReader in;
     protected PrintWriter out;
     protected Socket socket;
-    protected NoDbUserService userService;
+    protected UserService userService;
+    protected ProductService productService;
     JButton buttonPort;
     JList listAllUsers;
     JList listOnlineUsers;
@@ -23,7 +25,8 @@ public class ServerScreen {
     public ServerScreen(JFrame frame) {
         this.frame = frame;
         build();
-        this.userService = new NoDbUserService(listAllUsers, listOnlineUsers);
+        this.userService = new UserService(listAllUsers, listOnlineUsers);
+        this.productService = new ProductService();
     }
     
     public void waitConnection(int port)
@@ -40,7 +43,7 @@ public class ServerScreen {
                         Socket socket = serverSocket.accept();
                         System.out.println("New client connected");
 
-                        new ServerThread(socket, userService, listAllUsers, listOnlineUsers).start();
+                        new ServerThread(socket, productService, userService, listAllUsers, listOnlineUsers).start();
                     }
                 }
                 catch (IOException ex)
