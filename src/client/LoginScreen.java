@@ -82,8 +82,10 @@ public class LoginScreen extends DefaultScreen {
                  {
                      JFrame afterLoginFrame = new JFrame();
                      AfterLoginScreen afterLoginScreen = new AfterLoginScreen(afterLoginFrame, in, out, socket, username);
-                     showMessageDialog(null,"logado asdfasdf");
+                     showMessageDialog(null,"Logado");
                      afterLoginScreen.build();
+
+                     
                  }
                  else
                  {

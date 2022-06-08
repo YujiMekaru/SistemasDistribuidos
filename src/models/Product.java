@@ -10,19 +10,19 @@ package models;
  * @author Yuji
  */
 public class Product {
-    private int id;
+    private int productId;
     private String name;
     private String description;
     private float value;
-    private int sellerId;
+    private String username;
     
     public int getId()
     {
-        return id;
+        return productId;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.productId = id;
     }
 
     public String getName() {
@@ -49,12 +49,12 @@ public class Product {
         this.value = value;
     }
 
-    public int getSellerId() {
-        return sellerId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setSellerId(int sellerId) {
-        this.sellerId = sellerId;
+    public void setUsername(String username) {
+        this.username = username;
     }
     
     

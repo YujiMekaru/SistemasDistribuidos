@@ -25,10 +25,10 @@ public class ProductService {
     
     public void populate()
     {
-        createProduct("produto1","descricao1",10,1);
-        createProduct("produto2","descricao2",20,2);
-        createProduct("produto3","descricao3",30,3);
-        createProduct("produto4","descricao4",40,1);
+        createProduct("produto1","descricao1",10,"Joao");
+        createProduct("produto2","descricao2",20,"Pedro");
+        createProduct("produto3","descricao3",30,"Andre");
+        createProduct("produto4","descricao4",40,"Joao");
     }
     
     public List<Product> listAll()
@@ -36,19 +36,19 @@ public class ProductService {
         return products;
     }
     
-    public List<Product> listByUser(int id)
+    public List<Product> listByUser(String username)
     {
         List<Product> userProducts = new ArrayList<>();
         
         products.forEach(a -> {
-            if (a.getSellerId() == id)
+            if (a.getUsername().equals(username))
                 userProducts.add(a);
         });
         
         return userProducts;
     }
     
-    public boolean createProduct(String name, String description, float value, int sellerId)
+    public boolean createProduct(String name, String description, float value, String username)
     {
         if (name.equals("") || description.equals("") || value == 0)
             return false;
@@ -57,7 +57,7 @@ public class ProductService {
         newProduct.setName(name);
         newProduct.setDescription(description);
         newProduct.setValue(value);
-        newProduct.setSellerId(sellerId);
+        newProduct.setUsername(username);
         
         int lastId = 0;
         if (!products.isEmpty())
@@ -74,13 +74,42 @@ public class ProductService {
         return true;
     }
     
-    public void editProduct()
+    public boolean editProduct(String name, String description, float value, int productId)
     {
-        
+        for (int i = 0; i < products.size(); i++)
+        {
+            if (products.get(i).getId() == productId)
+            {
+                products.get(i).setName(name);
+                products.get(i).setDescription(description);
+                products.get(i).setValue(value);
+                
+                System.out.println("editou o produto");
+                System.out.println("Lista de produtos : ");
+                //remover depois
+                products.forEach(a -> System.out.println(a.getName()));
+                System.out.println("------");
+                return true;
+            }
+        }
+        return false;
     }
     
-    public void deleteProduct()
+    public boolean deleteProduct(int productId)
     {
-        
+        for (int i = 0; i < products.size(); i++)
+        {
+            if (products.get(i).getId() == productId)
+            {
+                products.remove(i);
+                System.out.println("removeu o produto");
+                System.out.println("Lista de produtos : ");
+                //remover depois
+                products.forEach(a -> System.out.println(a.getName()));
+                System.out.println("------");
+                return true;
+            }
+        }
+        return false;
     }
 }

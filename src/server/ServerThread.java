@@ -65,6 +65,12 @@ public class ServerThread extends Thread
         catch(IOException ex) 
         {
             System.out.println("Encerramento forçado de " + socket.getLocalAddress()); 
+            if (loggedUser != null)
+                userService.logout(loggedUser.getUsername()); 
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Erro na request de " + socket.getLocalAddress());
         }
     }
     
@@ -105,8 +111,8 @@ public class ServerThread extends Thread
                     return gson.toJson(listAllResponse);
                 case 500:
                     ListProductsRequestDTO listProductUserRequest = gson.fromJson(jsonRequest, ListProductsRequestDTO.class);
-                    System.out.println("Usuario logado id : " + loggedUser.getId());
-                    List<Product> userProducts = productService.listByUser(loggedUser.getId());
+                    System.out.println("Usuario logado id : " + loggedUser.getUsername());
+                    List<Product> userProducts = productService.listByUser(loggedUser.getUsername());
                     ListProductsResponse listUserProductsResponse = new ListProductsResponse(501, userProducts);
                     return gson.toJson(listUserProductsResponse);
                 case 800:
@@ -115,13 +121,26 @@ public class ServerThread extends Thread
                             createProductRequest.getProductName(), 
                             createProductRequest.getDescription(), 
                             createProductRequest.getProductValue(), 
-                            loggedUser.getId());
+                            loggedUser.getUsername());
                     if (result)
                         return gson.toJson(new DefaultResponse(801));
-                    return gson.toJson(new ErrorResponse(802, "mensagem de erro"));
-        
+                    return gson.toJson(new ErrorResponse(802, "Erro ao criar produto"));     
                 case 900:
-                    
+                   EditProductRequestDTO editProductRequest = gson.fromJson(jsonRequest, EditProductRequestDTO.class);
+                   result = productService.editProduct(
+                           editProductRequest.getProductName(), 
+                           editProductRequest.getDescription(), 
+                           editProductRequest.getProductValue(), 
+                           editProductRequest.getProductId());
+                   if (result)
+                       return gson.toJson(new DefaultResponse(901));
+                   return gson.toJson(new ErrorResponse(902, "Produto nao encontrado"));
+                case 1000:
+                   DeleteProductRequestDTO deleteProductRequest = gson.fromJson(jsonRequest, DeleteProductRequestDTO.class);
+                   result = productService.deleteProduct(deleteProductRequest.getProductId());
+                   if (result)
+                       return gson.toJson(new DefaultResponse(1001));
+                   return gson.toJson(new ErrorResponse(1002, "Produto nao encontrado"));
                 default: 
                     return gson.toJson(new DefaultResponse(999), DefaultResponse.class);
             }
