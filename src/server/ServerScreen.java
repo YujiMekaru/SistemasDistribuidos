@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import services.CommunicationService;
 import services.ProductService;
 import services.UserService;
 
@@ -18,6 +19,7 @@ public class ServerScreen {
     protected Socket socket;
     protected UserService userService;
     protected ProductService productService;
+    protected CommunicationService communicationService;
     JButton buttonPort;
     JList listAllUsers;
     JList listOnlineUsers;
@@ -27,6 +29,7 @@ public class ServerScreen {
         build();
         this.userService = new UserService(listAllUsers, listOnlineUsers);
         this.productService = new ProductService();
+        this.communicationService = new CommunicationService();
     }
     
     public void waitConnection(int port)
@@ -43,7 +46,7 @@ public class ServerScreen {
                         Socket socket = serverSocket.accept();
                         System.out.println("New client connected");
 
-                        new ServerThread(socket, productService, userService, listAllUsers, listOnlineUsers).start();
+                        new ServerThread(socket, productService, userService, communicationService, listAllUsers, listOnlineUsers).start();
                     }
                 }
                 catch (IOException ex)

@@ -122,4 +122,15 @@ public class UserService {
         return false;  
     }
     
+    public boolean checkIfOnline(String username)
+    {
+        for (int i = 0; i < onlineUsers.size(); i++)
+        {
+            if (onlineUsers.get(i).getUsername().equals(username))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

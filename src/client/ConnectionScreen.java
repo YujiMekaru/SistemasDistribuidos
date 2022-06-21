@@ -72,9 +72,18 @@ public class ConnectionScreen {
             {
                     try 
                     {
-                        String serverHostname = ipBox.getText();
-                        int port = Integer.parseInt(portBox.getText());
-                        
+                        String serverHostname;
+                        int port;
+                        if (ipBox.getText().equals(""))
+                        {
+                            serverHostname = new String ("127.0.0.1");
+                            port = 20000;
+                        }
+                        else
+                        {
+                            serverHostname = ipBox.getText();
+                            port = Integer.parseInt(portBox.getText());
+                        }
                         //String serverHostname = new String ("127.0.0.1");
                         System.out.println ("Attemping to connect to host " +
                                 serverHostname + " on port "+ port+".");

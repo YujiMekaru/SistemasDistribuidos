@@ -48,6 +48,22 @@ public class ProductService {
         return userProducts;
     }
     
+    public boolean buyProduct(int productId, String username)
+    {
+        
+        return true;
+    }
+    
+    public boolean checkIfProductExists(int productId)
+    {
+        for (int i = 0; i < products.size(); i++)
+        {
+            if (products.get(i).getId() == productId)
+                return true;
+        }
+        return false;
+    }
+    
     public boolean createProduct(String name, String description, float value, String username)
     {
         if (name.equals("") || description.equals("") || value == 0)
@@ -67,10 +83,6 @@ public class ProductService {
         
         products.add(newProduct);
         
-        System.out.println("Lista de produtos : ");
-        //remover depois
-        products.forEach(a -> System.out.println(a.getName()));
-        System.out.println("------");
         return true;
     }
     
@@ -102,11 +114,6 @@ public class ProductService {
             if (products.get(i).getId() == productId)
             {
                 products.remove(i);
-                System.out.println("removeu o produto");
-                System.out.println("Lista de produtos : ");
-                //remover depois
-                products.forEach(a -> System.out.println(a.getName()));
-                System.out.println("------");
                 return true;
             }
         }

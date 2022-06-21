@@ -7,11 +7,12 @@ package DTOs.requests;
 
 /**
  *
- * @author Yuji
+ * @author madeinweb
  */
-public class DeleteProductRequestDTO extends DefaultRequest {
+public class BuyProductRequestDTO extends DefaultRequest {
     private int productId;
-            
+    private String username;
+
     /**
      * @return the productId
      */
@@ -24,5 +25,19 @@ public class DeleteProductRequestDTO extends DefaultRequest {
      */
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @param username the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

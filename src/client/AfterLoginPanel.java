@@ -8,16 +8,23 @@ package client;
 import DTOs.requests.*;
 import DTOs.responses.*;
 import com.google.gson.Gson;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -41,6 +48,10 @@ public class AfterLoginPanel extends javax.swing.JPanel {
     private List<Product> allProducts;
     private boolean isHomePage;
     private Thread listenerThread;
+    private JButton btnAdd;
+    private JButton btnEdit;
+    private JButton btnRemove;
+    private JButton btnBuy;
     
     public AfterLoginPanel(JFrame frame, BufferedReader in, PrintWriter out, Socket socket, String username) {
         this.in = in;
@@ -51,40 +62,147 @@ public class AfterLoginPanel extends javax.swing.JPanel {
         allProducts = new ArrayList<>();
         isHomePage = true;
         initComponents();
-        initProductListener();
+        btnAdd = new JButton();
+        btnEdit = new JButton();
+        btnRemove = new JButton();
+        btnBuy = new JButton();
+        
+        btnAdd.setText("Adicionar");
+        btnEdit.setText("Editar");
+        btnRemove.setText("Remover");
+        btnBuy.setText("Comprar");
+        
+        btnAdd.setFont(new Font("Arial", Font.BOLD, 9));
+        btnRemove.setFont(new Font("Arial", Font.BOLD, 9));
+        
+        btnAdd.setBounds(160, 420, 80 ,30);
+        btnEdit.setBounds(250, 420, 80, 30);
+        btnRemove.setBounds(340, 420, 80 ,30);
+        btnBuy.setBounds(160,420, 250, 30);
 
+        frame.add(btnAdd);
+        frame.add(btnEdit);
+        frame.add(btnRemove);
+        frame.add(btnBuy);
+        
+        btnAdd.setVisible(false);       
+        btnEdit.setVisible(false);
+        btnRemove.setVisible(false);
+        createButtonActions();
+        
+        listCreateRequest(400);
+        initProductListener();
+        
+    }
+    
+    public void createButtonActions()
+    {
+        btnBuy.addActionListener((ActionListener) new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                int index = listProducts.getSelectedIndex();
+                Product product = allProducts.get(index);
+                
+                InitChatRequestDTO initChatRequest = new InitChatRequestDTO();
+                initChatRequest.setOp(1100);
+                initChatRequest.setBuyer_username(username);
+                initChatRequest.setProductId(product.getId());
+                initChatRequest.setSeller_username(product.getUsername());
+                
+                try
+                {
+                    Gson gson = new Gson();
+                    System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(initChatRequest) + "\n");
+                    out.println(gson.toJson(initChatRequest));
+                    String resposta = in.readLine();
+                    System.out.println("Servidor respondeu : " + resposta);
+                }
+                catch(IOException ex)
+                {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        });
+        
+        btnEdit.addActionListener((ActionListener) new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                JFrame formFrame = new JFrame();
+                int index = listProducts.getSelectedIndex();
+                Product product = allProducts.get(index);
+                ProductFormScreen formScreen = new ProductFormScreen(formFrame,in, out,socket,product);
+                formScreen.build();
+            }
+        });
+        
+        btnAdd.addActionListener((ActionListener) new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                JFrame formFrame = new JFrame();
+                ProductFormScreen formScreen = new ProductFormScreen(formFrame,in, out,socket,null);
+                formScreen.build();
+            }
+        });
+        
+        btnRemove.addActionListener((ActionListener) new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                try
+                {
+                    Gson gson = new Gson();
+                    DeleteProductRequestDTO deleteRequest = new DeleteProductRequestDTO();
+                    deleteRequest.setOp(1000);
+                    int index = 0;
+                    if (listProducts.getSelectedIndex() == -1)
+                         return;
+                    index = listProducts.getSelectedIndex();
+                    int productId = allProducts.get(index).getId();
+                    deleteRequest.setProductId(productId);
+                    System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(deleteRequest) + "\n\n");
+                    out.println(gson.toJson(deleteRequest));
+                    String resposta = in.readLine();
+                    System.out.println("Servidor respondeu : " + resposta);
+                    
+                    allProducts.remove(index);
+                    
+                    DecimalFormat moneyFormat = new DecimalFormat("0.00");
+                    DefaultListModel listModel = new DefaultListModel();
+                    allProducts.forEach(product -> listModel.addElement(product.getName() + " - R$" + moneyFormat.format(product.getValue()) + " - " + product.getUsername()));
+                    listProducts.setModel(listModel);
+                }
+                catch (IOException ex)
+                {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        });
     }
     
     
     
     public Thread instantiateListener()
     {
+        System.out.println("criou thread");
         Thread productListenerThread = new Thread(){
             public void run(){
+                
                 try {
+                    
                     while (true)
                     {
-                       if (!isHomePage)
-                           continue;
-
-                       Gson gson = new Gson();
-                       ListProductsRequestDTO listRequest = new ListProductsRequestDTO();
-                       listRequest.setOp(400);
-                       System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(listRequest) + "\n\n");
-                       out.println(gson.toJson(listRequest));
-                       String resposta = in.readLine();
-                       System.out.println("Servidor respondeu : " + resposta);
-                       ListProductsResponse serverResponse = gson.fromJson(resposta, ListProductsResponse.class);
-                       allProducts = serverResponse.getProductArray();
-                       DefaultListModel listModel = new DefaultListModel();
-                       allProducts.forEach(product -> listModel.addElement(product.getName()));
-                       listProducts.setModel(listModel);
                        Thread.sleep(6000);
+                       
+                       if (!isHomePage) // Produtos do Usuario
+                            listCreateRequest(500);
+                       else
+                            listCreateRequest(400);
                     }
                 } 
-                catch (IOException ex) {
-                    Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 catch (InterruptedException ex)
                 {
                     System.out.println(ex.getMessage());
@@ -104,6 +222,31 @@ public class AfterLoginPanel extends javax.swing.JPanel {
     {
         listenerThread.interrupt();
     }
+    
+    public void listCreateRequest(int op)
+    {
+        try 
+        {
+               Gson gson = new Gson();
+               ListProductsRequestDTO listRequest = new ListProductsRequestDTO();
+               listRequest.setOp(op);
+               System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(listRequest) + "\n");
+               out.println(gson.toJson(listRequest));
+               String resposta = in.readLine();
+               System.out.println("Servidor respondeu : " + resposta);
+               ListProductsResponse serverResponse = gson.fromJson(resposta, ListProductsResponse.class);
+               allProducts = serverResponse.getProductArray();
+               DecimalFormat moneyFormat = new DecimalFormat("0.00");
+               DefaultListModel listModel = new DefaultListModel();
+               allProducts.forEach(product -> listModel.addElement(product.getName() + " - R$" + moneyFormat.format(product.getValue()) + " - " + product.getUsername()));
+               listProducts.setModel(listModel);
+        } 
+        catch (IOException ex) {
+            Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -120,9 +263,6 @@ public class AfterLoginPanel extends javax.swing.JPanel {
         buttonLogout = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         listProducts = new javax.swing.JList<>();
-        buttonAdd = new javax.swing.JButton();
-        buttonEdit = new javax.swing.JButton();
-        buttonRemove = new javax.swing.JButton();
 
         panelMenu.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -178,28 +318,15 @@ public class AfterLoginPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(listProducts);
 
-        buttonAdd.setText("Adicionar");
-
-        buttonEdit.setText("Editar");
-
-        buttonRemove.setText("Remover");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(buttonAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(buttonEdit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(buttonRemove))
-                    .addComponent(jScrollPane1))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,12 +334,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonAdd)
-                    .addComponent(buttonEdit)
-                    .addComponent(buttonRemove))
-                .addContainerGap())
+                .addContainerGap(40, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -245,28 +367,13 @@ public class AfterLoginPanel extends javax.swing.JPanel {
     private void buttonProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonProductsActionPerformed
         if (!isHomePage)
             return;
-        
+        btnAdd.setVisible(true);       
+        btnEdit.setVisible(true);
+        btnRemove.setVisible(true);
+        btnBuy.setVisible(false);
         isHomePage = false;
-        try
-        {
-         stopProductListener();
-         Gson gson = new Gson();
-                       ListProductsRequestDTO listRequest = new ListProductsRequestDTO();
-                       listRequest.setOp(500);
-                       System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(listRequest) + "\n\n");
-                       out.println(gson.toJson(listRequest));
-                       String resposta = in.readLine();
-                       System.out.println("Servidor respondeu : " + resposta);
-                       ListProductsResponse serverResponse = gson.fromJson(resposta, ListProductsResponse.class);
-                       allProducts = serverResponse.getProductArray();
-                       DefaultListModel listModel = new DefaultListModel();
-                       allProducts.forEach(product -> listModel.addElement(product.getName()));
-                       listProducts.setModel(listModel);
-        }
-        catch (IOException e)
-        {
-            Logger.getLogger(ClientInterface.class.getName()).log(Level.SEVERE, null, e);
-        }
+        listCreateRequest(500);
+
     }//GEN-LAST:event_buttonProductsActionPerformed
 
     private void buttonHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHomeActionPerformed
@@ -274,17 +381,19 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             return;
         
         isHomePage = true;
-        initProductListener();
+        btnAdd.setVisible(false);       
+        btnEdit.setVisible(false);
+        btnRemove.setVisible(false);
+        btnBuy.setVisible(true);
+        listCreateRequest(400);
+       // initProductListener();
     }//GEN-LAST:event_buttonHomeActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton buttonAdd;
-    private javax.swing.JButton buttonEdit;
     private javax.swing.JButton buttonHome;
     private javax.swing.JButton buttonLogout;
     private javax.swing.JButton buttonProducts;
-    private javax.swing.JButton buttonRemove;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList<String> listProducts;
     private javax.swing.JPanel panelMenu;
