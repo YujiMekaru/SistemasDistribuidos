@@ -162,6 +162,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                          return;
                     index = listProducts.getSelectedIndex();
                     int productId = allProducts.get(index).getId();
+                    //deleteRequest.setUsername(username);
                     deleteRequest.setProductId(productId);
                     System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(deleteRequest) + "\n\n");
                     out.println(gson.toJson(deleteRequest));
@@ -195,7 +196,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                     
                     while (true)
                     {
-                       Thread.sleep(6000);
+                       Thread.sleep(10000);
                        
                        if (!isHomePage) // Produtos do Usuario
                             listCreateRequest(500);
