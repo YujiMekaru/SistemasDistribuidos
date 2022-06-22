@@ -10,12 +10,16 @@ import java.net.Socket;
 import DTOs.requests.*;
 import DTOs.responses.DefaultResponse;
 import DTOs.responses.ErrorResponse;
+import DTOs.responses.InterestResponse;
 import DTOs.responses.ListProductsResponse;
+import DTOs.responses.ProductDetailsResponse;
+import DTOs.responses.WishlistResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JList;
+import models.Interest;
 import models.Product;
 import models.User;
 import services.CommunicationService;
@@ -121,8 +125,22 @@ public class ServerThread extends Thread
                     ListProductsResponse listUserProductsResponse = new ListProductsResponse(501, userProducts);
                     return gson.toJson(listUserProductsResponse);
                 case 600:
-                    BuyProductRequestDTO buyProductRequest = gson.fromJson(jsonRequest, BuyProductRequestDTO.class);
+                    ProductDetailsRequestDTO buyProductRequest = gson.fromJson(jsonRequest, ProductDetailsRequestDTO.class);
+                    ProductDetailsResponse response = productService.productDetails(buyProductRequest.getProductId(), buyProductRequest.getUsername());
                     
+                    Product product = productService.getById(buyProductRequest.getProductId());
+                    response.setSellerStatus(userService.checkIfOnline(product.getUsername()));
+                    result = productService.addInterest(product.getName(),product.getId(), loggedUser.getUsername());
+                    if (result)
+                        return gson.toJson(response);
+                    return gson.toJson(new ErrorResponse(602, "Já demonstrou interesse."));
+                case 700:
+                    WishlistRequestDTO wishlistRequest = gson.fromJson(jsonRequest, WishlistRequestDTO.class);
+                    List<InterestResponse> interestList = productService.listInterests(wishlistRequest.getUsername());
+                    WishlistResponse wishlistResponse = new WishlistResponse();
+                    wishlistResponse.setStatusCode(701);
+                    wishlistResponse.setBuyerArray(interestList);
+                    return gson.toJson(wishlistResponse);
                 case 800:
                     CreateProductRequestDTO createProductRequest = gson.fromJson(jsonRequest, CreateProductRequestDTO.class);
                     result = productService.createProduct(

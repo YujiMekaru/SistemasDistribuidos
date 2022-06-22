@@ -5,8 +5,11 @@
  */
 package services;
 
+import DTOs.responses.InterestResponse;
+import DTOs.responses.ProductDetailsResponse;
 import java.util.ArrayList;
 import java.util.List;
+import models.Interest;
 import models.Product;
 import models.User;
 
@@ -16,10 +19,12 @@ import models.User;
  */
 public class ProductService {
     private List<Product> products;
+    private List<Interest> interests;
     
     public ProductService()
     {
         products = new ArrayList<>();
+        interests = new ArrayList<>();
         populate();
     }
     
@@ -29,6 +34,53 @@ public class ProductService {
         createProduct("produto2","descricao2",20,"Pedro");
         createProduct("produto3","descricao3",30,"Andre");
         createProduct("produto4","descricao4",40,"Joao");
+    }
+    
+    public boolean addInterest(String productName, int productId, String interestedUsername)
+    {
+        for (int i = 0; i < interests.size(); i++)
+        {
+            if (interests.get(i).getBuyerUsername().equals(interestedUsername) && interests.get(i).getProductId() == productId)
+            {
+                return false;
+            }
+        }
+        
+        Interest toAdd = new Interest();
+        toAdd.setBuyerUsername(interestedUsername);
+        toAdd.setObjectName(productName);
+        toAdd.setProductId(productId);
+        toAdd.setProduct(getById(productId));
+        interests.add(toAdd);
+        return true;
+    }
+    
+    public List<InterestResponse> listInterests(String username)
+    {
+        List<InterestResponse> response = new ArrayList<>();
+        for (int i = 0; i < interests.size(); i++)
+        {
+            if (interests.get(i).getProduct().getUsername().equals(username))
+            {
+                InterestResponse toAdd = new InterestResponse();
+                toAdd.setBuyerUsername(interests.get(i).getBuyerUsername());
+                toAdd.setObjectName(interests.get(i).getObjectName());
+                toAdd.setProductID(interests.get(i).getProductId());
+            }
+        }
+        return response;
+    }
+    
+    public Product getById(int productId)
+    {
+        for (int i = 0; i < products.size(); i++)
+        {
+            if (products.get(i).getId() == productId)
+            {
+                return products.get(i);
+            }
+        }
+        return null;
     }
     
     public List<Product> listAll()
@@ -48,10 +100,24 @@ public class ProductService {
         return userProducts;
     }
     
-    public boolean buyProduct(int productId, String username)
+    public ProductDetailsResponse productDetails(int productId, String username)
     {
         
-        return true;
+        for (int i = 0; i < products.size(); i++)
+        {
+            if (products.get(i).getId() == productId)
+            {
+                ProductDetailsResponse p = new ProductDetailsResponse();
+                p.setDescription(products.get(i).getDescription());
+                p.setProductId(products.get(i).getId());
+                p.setProductName(products.get(i).getName());
+                p.setProductValue(products.get(i).getValue());
+                p.setStatusCode(601);
+                p.setSellerName(products.get(i).getUsername());
+                return p;
+            }
+        }
+        return null;        
     }
     
     public boolean checkIfProductExists(int productId)

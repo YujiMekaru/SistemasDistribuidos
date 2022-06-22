@@ -9,7 +9,7 @@ package DTOs.requests;
  *
  * @author madeinweb
  */
-public class BuyProductRequestDTO extends DefaultRequest {
+public class ProductDetailsRequestDTO extends DefaultRequest {
     private int productId;
     private String username;
 
