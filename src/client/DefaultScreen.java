@@ -16,15 +16,13 @@ import javax.swing.JFrame;
  */
 public class DefaultScreen {
     protected JFrame frame;
-    protected BufferedReader in;
-    protected PrintWriter out;
+    protected Middleware middleware;
     protected Socket socket;
     
-    public DefaultScreen(JFrame frame, BufferedReader in, PrintWriter out, Socket socket)
+    public DefaultScreen(JFrame frame, Middleware middleware, Socket socket)
     {
         this.frame = frame;
-        this.in = in;
-        this.out = out;
+        this.middleware = middleware;
         this.socket = socket;
     }
 }

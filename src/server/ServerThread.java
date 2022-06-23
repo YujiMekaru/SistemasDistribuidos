@@ -12,6 +12,7 @@ import DTOs.responses.DefaultResponse;
 import DTOs.responses.ErrorResponse;
 import DTOs.responses.InterestResponse;
 import DTOs.responses.ListProductsResponse;
+import DTOs.responses.LoginResponse;
 import DTOs.responses.ProductDetailsResponse;
 import DTOs.responses.WishlistResponse;
 import com.google.gson.Gson;
@@ -74,7 +75,11 @@ public class ServerThread extends Thread
         {
             System.out.println("Encerramento forçado de " + socket.getLocalAddress()); 
             if (loggedUser != null)
+            {
                 userService.logout(loggedUser.getUsername()); 
+                communicationService.removeClient(loggedUser.getUsername());
+            }
+            
         }
         catch(Exception ex)
         {
@@ -100,7 +105,11 @@ public class ServerThread extends Thread
                     {
                         loggedUser = user;
                         communicationService.addClient(socket, user);
-                        return gson.toJson(new DefaultResponse(101), DefaultResponse.class);
+                        int count = productService.countInterest(user.getUsername());
+                        LoginResponse loginResponse = new LoginResponse();
+                        loginResponse.setStatusCode(101);
+                        loginResponse.setWishlist(count);
+                        return gson.toJson(loginResponse);
                     }
                     return gson.toJson(new DefaultResponse(102), DefaultResponse.class);
                 case 200:
@@ -127,13 +136,10 @@ public class ServerThread extends Thread
                 case 600:
                     ProductDetailsRequestDTO buyProductRequest = gson.fromJson(jsonRequest, ProductDetailsRequestDTO.class);
                     ProductDetailsResponse response = productService.productDetails(buyProductRequest.getProductId(), buyProductRequest.getUsername());
-                    
                     Product product = productService.getById(buyProductRequest.getProductId());
                     response.setSellerStatus(userService.checkIfOnline(product.getUsername()));
-                    result = productService.addInterest(product.getName(),product.getId(), loggedUser.getUsername());
-                    if (result)
-                        return gson.toJson(response);
-                    return gson.toJson(new ErrorResponse(602, "Já demonstrou interesse."));
+                    productService.addInterest(product.getName(),product.getId(), loggedUser.getUsername());
+                    return gson.toJson(response);
                 case 700:
                     WishlistRequestDTO wishlistRequest = gson.fromJson(jsonRequest, WishlistRequestDTO.class);
                     List<InterestResponse> interestList = productService.listInterests(wishlistRequest.getUsername());
@@ -175,7 +181,7 @@ public class ServerThread extends Thread
                     return gson.toJson(new ErrorResponse(1102, "Usuario Offline ou Produto nao existe."));
                 case 1200:
                     ChatMessageRequestDTO messageRequest = gson.fromJson(jsonRequest, ChatMessageRequestDTO.class);
-                    communicationService.sendMessage(messageRequest.getUsername(), messageRequest.getMessage());
+                    communicationService.sendMessage(messageRequest.getUsername(), messageRequest.getMessage(), loggedUser.getUsername());
                     return gson.toJson(new DefaultResponse(1201));
                 default: 
                     return gson.toJson(new DefaultResponse(999), DefaultResponse.class);

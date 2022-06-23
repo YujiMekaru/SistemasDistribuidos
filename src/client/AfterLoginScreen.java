@@ -34,15 +34,15 @@ import models.User;
 public class AfterLoginScreen extends DefaultScreen {
     private String username;
     
-    public AfterLoginScreen(JFrame frame, BufferedReader in, PrintWriter out, Socket socket, String username)
+    public AfterLoginScreen(JFrame frame, Middleware middleware, Socket socket, String username)
     {
-        super(frame, in, out, socket);
+        super(frame, middleware, socket);
         this.username = username;
     }
     
     public void build()
     {
-        AfterLoginPanel panel = new AfterLoginPanel(frame, in, out, socket, username);
+        AfterLoginPanel panel = new AfterLoginPanel(frame, middleware, socket, username);
         frame.getContentPane().add(panel);
         frame.setSize(500,500);
         frame.setVisible(true);

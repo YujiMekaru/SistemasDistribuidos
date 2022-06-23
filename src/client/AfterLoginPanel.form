@@ -54,6 +54,7 @@
                       <Component id="buttonHome" max="32767" attributes="0"/>
                       <Component id="buttonProducts" pref="106" max="32767" attributes="0"/>
                       <Component id="buttonLogout" alignment="0" max="32767" attributes="0"/>
+                      <Component id="btnWishlist" alignment="1" pref="106" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -66,6 +67,8 @@
                   <Component id="buttonHome" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonProducts" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnWishlist" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="buttonLogout" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -96,6 +99,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonLogoutActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnWishlist">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Interessados"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnWishlistActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

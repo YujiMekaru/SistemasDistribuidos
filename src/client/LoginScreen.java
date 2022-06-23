@@ -8,6 +8,7 @@ package client;
 import DTOs.requests.LoginRequestDTO;
 import DTOs.requests.RegisterRequestDTO;
 import DTOs.responses.DefaultResponse;
+import DTOs.responses.LoginResponse;
 import com.google.gson.Gson;
 import java.awt.event.*;
 import java.io.BufferedReader;
@@ -25,9 +26,9 @@ import static javax.swing.JOptionPane.showMessageDialog;
  */
 public class LoginScreen extends DefaultScreen {
     
-    public LoginScreen(JFrame frame, BufferedReader in, PrintWriter out, Socket socket)
+    public LoginScreen(JFrame frame, Middleware middleware, Socket socket)
     {
-        super(frame, in, out, socket);
+        super(frame, middleware, socket);
     }
     
     public void build() {
@@ -73,16 +74,18 @@ public class LoginScreen extends DefaultScreen {
                  loginRequest.setPassword(password);
 
                  System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(loginRequest) + "\n\n");
-                 out.println(gson.toJson(loginRequest));
-                 String resposta = in.readLine();
+                 middleware.println(gson.toJson(loginRequest));
+                 String resposta = middleware.readLine();
                  System.out.println("Servidor respondeu : " + resposta);
-                 DefaultResponse serverResponse = gson.fromJson(resposta, DefaultResponse.class);
+                 LoginResponse serverResponse = gson.fromJson(resposta, LoginResponse.class);
 
                  if (serverResponse.getStatus() == 101)
                  {
                      JFrame afterLoginFrame = new JFrame();
-                     AfterLoginScreen afterLoginScreen = new AfterLoginScreen(afterLoginFrame, in, out, socket, username);
+                     AfterLoginScreen afterLoginScreen = new AfterLoginScreen(afterLoginFrame, middleware, socket, username);
                      showMessageDialog(null,"Logado");
+                     if (serverResponse.getWishlist() > 0)
+                         showMessageDialog(null, "Voce tem "+ serverResponse.getWishlist() + " interessados");
                      afterLoginScreen.build();
 
                      
@@ -111,8 +114,8 @@ public class LoginScreen extends DefaultScreen {
                  registerRequest.setPassword(password);
 
                  System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(registerRequest) + "\n\n");
-                 out.println(gson.toJson(registerRequest));
-                 String resposta = in.readLine();
+                 middleware.println(gson.toJson(registerRequest));
+                 String resposta = middleware.readLine();
                  System.out.println("Servidor respondeu : " + resposta);
 
              } catch (IOException ex) {

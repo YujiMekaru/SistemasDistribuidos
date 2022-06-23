@@ -89,16 +89,14 @@ public class ConnectionScreen {
                                 serverHostname + " on port "+ port+".");
 
                         Socket socket = null;                   
-                        PrintWriter out = null;                       
-                        BufferedReader in = null;
+                        Middleware middleware = null;
                         JFrame f = new JFrame();
 
                         try 
                         {
                             socket = new Socket(serverHostname, port);
-                            out = new PrintWriter(socket.getOutputStream(), true);
-                            in = new BufferedReader(new InputStreamReader(
-                                                        socket.getInputStream()));
+                            
+                            middleware = new Middleware(socket);
                             System.out.println("Connected!");
                         } 
                         catch (UnknownHostException ex) 
@@ -114,10 +112,7 @@ public class ConnectionScreen {
                             return;
                         }
 
-                         BufferedReader stdIn = new BufferedReader(
-                                                   new InputStreamReader(System.in));
-
-                        LoginScreen loginScreen = new LoginScreen(f, in, out, socket);
+                        LoginScreen loginScreen = new LoginScreen(f, middleware, socket);
                         loginScreen.build();
                     } 
                     catch (Exception ex) 

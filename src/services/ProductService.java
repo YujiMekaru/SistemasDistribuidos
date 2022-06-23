@@ -36,13 +36,13 @@ public class ProductService {
         createProduct("produto4","descricao4",40,"Joao");
     }
     
-    public boolean addInterest(String productName, int productId, String interestedUsername)
+    public void addInterest(String productName, int productId, String interestedUsername)
     {
         for (int i = 0; i < interests.size(); i++)
         {
             if (interests.get(i).getBuyerUsername().equals(interestedUsername) && interests.get(i).getProductId() == productId)
             {
-                return false;
+                return;
             }
         }
         
@@ -52,7 +52,19 @@ public class ProductService {
         toAdd.setProductId(productId);
         toAdd.setProduct(getById(productId));
         interests.add(toAdd);
-        return true;
+    }
+    
+    public int countInterest(String username)
+    {
+       int count = 0; 
+        for (int i = 0; i < interests.size(); i++)
+        {
+            if (interests.get(i).getProduct().getUsername().equals(username))
+            {
+                count++;
+            }
+        }
+        return count;
     }
     
     public List<InterestResponse> listInterests(String username)
@@ -66,6 +78,7 @@ public class ProductService {
                 toAdd.setBuyerUsername(interests.get(i).getBuyerUsername());
                 toAdd.setObjectName(interests.get(i).getObjectName());
                 toAdd.setProductID(interests.get(i).getProductId());
+                response.add(toAdd);
             }
         }
         return response;
@@ -179,6 +192,11 @@ public class ProductService {
         {
             if (products.get(i).getId() == productId)
             {
+                for (int j = 0; j < interests.size(); j++)
+                {
+                    if (interests.get(j).getProductId() == productId)
+                        interests.remove(j);
+                }
                 products.remove(i);
                 return true;
             }

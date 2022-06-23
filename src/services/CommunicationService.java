@@ -5,6 +5,8 @@
  */
 package services;
 
+import DTOs.requests.ChatMessageRequestDTO;
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -47,18 +49,25 @@ public class CommunicationService {
         }
     }
     
-    public boolean sendMessage(String username, String message) 
+    public boolean sendMessage(String destinationUsername, String message, String clientUsername) 
     {
         try
         {
             for (int i = 0; i < clients.size(); i++)
             {
-                if (clients.get(i).getUser().getUsername().equals(username))
+                if (clients.get(i).getUser().getUsername().equals(destinationUsername))
                 {
                     Socket socket = clients.get(i).getUserSocket();
                     OutputStream output = socket.getOutputStream();
                     PrintWriter writer = new PrintWriter(output, true);
-                    writer.println(message);
+                    Gson gson = new Gson();
+                    ChatMessageRequestDTO messageRequest = new ChatMessageRequestDTO();
+                    messageRequest.setOp(1300);
+                    messageRequest.setMessage(message);
+                    messageRequest.setUsername(clientUsername);
+                    writer.println(gson.toJson(messageRequest));
+                    System.out.println("\nSocket : "+ socket.getPort());
+                    System.out.println("\nCHAT : " +gson.toJson(messageRequest));
                     return true;
                 }
             }    

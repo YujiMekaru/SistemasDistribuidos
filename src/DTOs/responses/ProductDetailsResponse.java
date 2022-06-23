@@ -90,7 +90,7 @@ public class ProductDetailsResponse extends DefaultResponse {
     /**
      * @return the sellerStatus
      */
-    public boolean isSellerStatus() {
+    public boolean getSellerStatus() {
         return sellerStatus;
     }
 

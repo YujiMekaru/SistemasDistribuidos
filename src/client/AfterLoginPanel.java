@@ -41,8 +41,6 @@ public class AfterLoginPanel extends javax.swing.JPanel {
      * Creates new form AfterLoginPanel
      */
     private JFrame frame;
-    private BufferedReader in;
-    private PrintWriter out;
     private Socket socket;
     private String username;
     private List<Product> allProducts;
@@ -52,10 +50,11 @@ public class AfterLoginPanel extends javax.swing.JPanel {
     private JButton btnEdit;
     private JButton btnRemove;
     private JButton btnBuy;
+    private Middleware middleware;
     
-    public AfterLoginPanel(JFrame frame, BufferedReader in, PrintWriter out, Socket socket, String username) {
-        this.in = in;
-        this.out = out;
+    public AfterLoginPanel(JFrame frame, Middleware middleware, Socket socket, String username) {
+        this.middleware = middleware;
+        middleware.setClientUsername(username);
         this.socket = socket;
         this.frame = frame;
         this.username = username;
@@ -85,13 +84,14 @@ public class AfterLoginPanel extends javax.swing.JPanel {
         frame.add(btnRemove);
         frame.add(btnBuy);
         
+        frame.setTitle(username);
         btnAdd.setVisible(false);       
         btnEdit.setVisible(false);
         btnRemove.setVisible(false);
         createButtonActions();
         
         listCreateRequest(400);
-        initProductListener();
+        //initProductListener();
         
     }
     
@@ -103,25 +103,61 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             {
                 int index = listProducts.getSelectedIndex();
                 Product product = allProducts.get(index);
+                ProductDetailsRequestDTO interestRequest = new ProductDetailsRequestDTO();
+                interestRequest.setOp(600);
+                interestRequest.setProductId(product.getId());
+                interestRequest.setUsername(username);
                 
-                InitChatRequestDTO initChatRequest = new InitChatRequestDTO();
-                initChatRequest.setOp(1100);
-                initChatRequest.setBuyer_username(username);
-                initChatRequest.setProductId(product.getId());
-                initChatRequest.setSeller_username(product.getUsername());
-                
-                try
+                try 
                 {
                     Gson gson = new Gson();
-                    System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(initChatRequest) + "\n");
-                    out.println(gson.toJson(initChatRequest));
-                    String resposta = in.readLine();
+                    System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(interestRequest) + "\n");
+                    middleware.println(gson.toJson(interestRequest));
+                    String resposta = middleware.readLine();
                     System.out.println("Servidor respondeu : " + resposta);
+                    ProductDetailsResponse detailsResponse = gson.fromJson(resposta, ProductDetailsResponse.class);
+                    if (detailsResponse.getSellerStatus())
+                    {
+                        InitChatRequestDTO initChatRequest = new InitChatRequestDTO();
+                        initChatRequest.setOp(1100);
+                        initChatRequest.setBuyer_username(username);
+                        initChatRequest.setProductId(product.getId());
+                        initChatRequest.setSeller_username(product.getUsername());
+
+                        try
+                        {
+                            System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(initChatRequest) + "\n");
+                            middleware.println(gson.toJson(initChatRequest));
+                            String serverresposta = middleware.readLine();
+                            System.out.println("Servidor respondeu : " + serverresposta);
+                            DefaultResponse response = gson.fromJson(serverresposta, DefaultResponse.class);
+                            if (response.getStatus() == 1101)
+                            {
+                                JFrame chatFrame = new JFrame();
+                                ChatScreen chatScreen = new ChatScreen(chatFrame, middleware, socket, product.getUsername(), "", username);
+                                ChatUser toAdd = new ChatUser();
+                                toAdd.setChatScreen(chatScreen);
+                                toAdd.setUsername(product.getUsername());
+                                boolean result = middleware.addChatUser(toAdd);
+                                if (result)
+                                    chatScreen.build();
+                            }
+                         }
+                        catch(IOException ex)
+                        {
+                            System.out.println(ex.getMessage());
+                        }
+                    }
+                   
                 }
-                catch(IOException ex)
+                catch (IOException ex)
                 {
                     System.out.println(ex.getMessage());
                 }
+                
+
+                
+
             }
         });
         
@@ -132,7 +168,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                 JFrame formFrame = new JFrame();
                 int index = listProducts.getSelectedIndex();
                 Product product = allProducts.get(index);
-                ProductFormScreen formScreen = new ProductFormScreen(formFrame,in, out,socket,product);
+                ProductFormScreen formScreen = new ProductFormScreen(formFrame,middleware,socket,product);
                 formScreen.build();
             }
         });
@@ -142,7 +178,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) 
             {
                 JFrame formFrame = new JFrame();
-                ProductFormScreen formScreen = new ProductFormScreen(formFrame,in, out,socket,null);
+                ProductFormScreen formScreen = new ProductFormScreen(formFrame, middleware,socket,null);
                 formScreen.build();
             }
         });
@@ -165,8 +201,8 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                     //deleteRequest.setUsername(username);
                     deleteRequest.setProductId(productId);
                     System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(deleteRequest) + "\n\n");
-                    out.println(gson.toJson(deleteRequest));
-                    String resposta = in.readLine();
+                    middleware.println(gson.toJson(deleteRequest));
+                    String resposta = middleware.readLine();
                     System.out.println("Servidor respondeu : " + resposta);
                     
                     allProducts.remove(index);
@@ -183,12 +219,10 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             }
         });
     }
-    
-    
+
     
     public Thread instantiateListener()
     {
-        System.out.println("criou thread");
         Thread productListenerThread = new Thread(){
             public void run(){
                 
@@ -232,8 +266,8 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                ListProductsRequestDTO listRequest = new ListProductsRequestDTO();
                listRequest.setOp(op);
                System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(listRequest) + "\n");
-               out.println(gson.toJson(listRequest));
-               String resposta = in.readLine();
+               middleware.println(gson.toJson(listRequest));
+               String resposta = middleware.readLine();
                System.out.println("Servidor respondeu : " + resposta);
                ListProductsResponse serverResponse = gson.fromJson(resposta, ListProductsResponse.class);
                allProducts = serverResponse.getProductArray();
@@ -262,6 +296,7 @@ public class AfterLoginPanel extends javax.swing.JPanel {
         buttonHome = new javax.swing.JButton();
         buttonProducts = new javax.swing.JButton();
         buttonLogout = new javax.swing.JButton();
+        btnWishlist = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         listProducts = new javax.swing.JList<>();
 
@@ -288,6 +323,13 @@ public class AfterLoginPanel extends javax.swing.JPanel {
             }
         });
 
+        btnWishlist.setText("Interessados");
+        btnWishlist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnWishlistActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelMenuLayout = new javax.swing.GroupLayout(panelMenu);
         panelMenu.setLayout(panelMenuLayout);
         panelMenuLayout.setHorizontalGroup(
@@ -297,7 +339,8 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                 .addGroup(panelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(buttonHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonProducts, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
-                    .addComponent(buttonLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnWishlist, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelMenuLayout.setVerticalGroup(
@@ -307,6 +350,8 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                 .addComponent(buttonHome)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonProducts)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnWishlist)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(buttonLogout)
                 .addContainerGap())
@@ -346,8 +391,8 @@ public class AfterLoginPanel extends javax.swing.JPanel {
                  logoutRequest.setOp(200);
                  logoutRequest.setUsername(username);
                  System.out.printf("\n\nMensagem Enviada para o Server : " + gson.toJson(logoutRequest) + "\n\n");
-                 out.println(gson.toJson(logoutRequest));
-                 String resposta = in.readLine();
+                 middleware.println(gson.toJson(logoutRequest));
+                 String resposta = middleware.readLine();
                  System.out.println("Servidor respondeu : " + resposta);
                  DefaultResponse serverResponse = gson.fromJson(resposta, DefaultResponse.class);
                  if (serverResponse.getStatus() == 201)
@@ -390,8 +435,15 @@ public class AfterLoginPanel extends javax.swing.JPanel {
        // initProductListener();
     }//GEN-LAST:event_buttonHomeActionPerformed
 
+    private void btnWishlistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWishlistActionPerformed
+        JFrame wishlistFrame = new JFrame();
+        WishlistScreen wishlistScreen = new WishlistScreen(wishlistFrame, middleware,socket,username);
+        wishlistScreen.build();
+    }//GEN-LAST:event_btnWishlistActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnWishlist;
     private javax.swing.JButton buttonHome;
     private javax.swing.JButton buttonLogout;
     private javax.swing.JButton buttonProducts;

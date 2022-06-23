@@ -38,8 +38,8 @@ public class ProductFormScreen extends DefaultScreen{
     
     private Product product;
     
-    public ProductFormScreen(JFrame frame, BufferedReader in, PrintWriter out, Socket socket, Product product) {
-        super(frame, in, out, socket);
+    public ProductFormScreen(JFrame frame, Middleware middleware, Socket socket, Product product) {
+        super(frame, middleware, socket);
         this.product = product;
     }
     
@@ -100,8 +100,8 @@ public class ProductFormScreen extends DefaultScreen{
                         createProductRequest.setProductValue(Float.parseFloat(txtValue.getText()));
 
                         System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(createProductRequest) + "\n");
-                        out.println(gson.toJson(createProductRequest));
-                        String resposta = in.readLine();
+                        middleware.println(gson.toJson(createProductRequest));
+                        String resposta = middleware.readLine();
                         System.out.println("Servidor respondeu : " + resposta);  
                     }
                     catch (IOException ex)
@@ -121,8 +121,8 @@ public class ProductFormScreen extends DefaultScreen{
                         editProductRequest.setProductId(product.getId());
 
                         System.out.printf("\nMensagem Enviada para o Server : " + gson.toJson(editProductRequest) + "\n");
-                        out.println(gson.toJson(editProductRequest));
-                        String resposta = in.readLine();
+                        middleware.println(gson.toJson(editProductRequest));
+                        String resposta = middleware.readLine();
                         System.out.println("Servidor respondeu : " + resposta);  
                     }
                     catch (IOException ex)
