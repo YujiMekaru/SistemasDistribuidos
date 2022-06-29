@@ -45,7 +45,6 @@ public class ProductFormScreen extends DefaultScreen{
     
     public void build()
     {
-        System.out.println("rodou");
         lblName = new JLabel();
         lblValue = new JLabel();
         lblDescription = new JLabel();

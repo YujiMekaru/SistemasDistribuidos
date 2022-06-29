@@ -66,8 +66,7 @@ public class CommunicationService {
                     messageRequest.setMessage(message);
                     messageRequest.setUsername(clientUsername);
                     writer.println(gson.toJson(messageRequest));
-                    System.out.println("\nSocket : "+ socket.getPort());
-                    System.out.println("\nCHAT : " +gson.toJson(messageRequest));
+                    System.out.println("\nServer Enviou Chat : " +gson.toJson(messageRequest));
                     return true;
                 }
             }    

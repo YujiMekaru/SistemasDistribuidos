@@ -52,17 +52,17 @@ public class Middleware {
         Middleware mid = this;
         Thread chatListenerThread = new Thread(){
             public void run(){
-                System.out.println("rodou a thread");
                 Gson gson = new Gson();
                while (true)
                {
                     try 
                     {
                         String json = in.readLine();
-                        System.out.println("THREAD RECEBEU : " +json);
+                        
                         DefaultRequest request = gson.fromJson(json, DefaultRequest.class);
                         if (request.getOp() == 1300)
                         {
+                            System.out.println("(Chat) Recebeu do Servidor : " +json);
                             ChatMessageRequestDTO messageRequest = gson.fromJson(json, ChatMessageRequestDTO.class);
                             String emitterUser = messageRequest.getUsername();
                             boolean hasChat = false;

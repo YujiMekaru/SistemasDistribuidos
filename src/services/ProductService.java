@@ -175,11 +175,6 @@ public class ProductService {
                 products.get(i).setDescription(description);
                 products.get(i).setValue(value);
                 
-                System.out.println("editou o produto");
-                System.out.println("Lista de produtos : ");
-                //remover depois
-                products.forEach(a -> System.out.println(a.getName()));
-                System.out.println("------");
                 return true;
             }
         }

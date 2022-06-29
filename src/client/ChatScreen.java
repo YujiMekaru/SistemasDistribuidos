@@ -71,6 +71,8 @@ public class ChatScreen extends DefaultScreen {
                 System.out.println("\nEnviado para o server : " + gson.toJson(messageRequest));
                 try {
                     middleware.println(gson.toJson(messageRequest));
+                    String serverResponse = middleware.readLine();
+                    System.out.println("Servidor respondeu : "+ serverResponse);
                 } catch (IOException ex) {
                     Logger.getLogger(ChatScreen.class.getName()).log(Level.SEVERE, null, ex);
                 }
